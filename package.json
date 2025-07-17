@@ -1,5 +1,5 @@
 {
-  "name": "aitok-ui",
+  "name": "aitok-full",
   "version": "1.0.0",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "vite": "^4.5.0",
-    "@vitejs/plugin-react": "^4.2.1"
+    "@vitejs/plugin-react": "^4.1.0",
+    "vite": "^4.4.9"
   }
 }

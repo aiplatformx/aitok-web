@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import './index.css';
 
 const supabase = createClient(
   'https://abxqbvvgefgwszrlgviu.supabase.co',
@@ -8,7 +9,10 @@ const supabase = createClient(
 
 export default function App() {
   const [videos, setVideos] = useState([]);
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const [current, setCurrent] = useState(0);
+  const [likes, setLikes] = useState({});
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -29,28 +33,81 @@ export default function App() {
     }
   };
 
+  const handleUpload = async () => {
+    if (!file) return;
+    setUploading(true);
+    const ext = file.name.split('.').pop();
+    const fileName = `${Date.now()}.${ext}`;
+    const filePath = `videos/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('videos')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      alert('Yükleme hatası');
+      console.error(uploadError);
+      setUploading(false);
+      return;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('videos')
+      .getPublicUrl(filePath);
+
+    const { error: insertError } = await supabase
+      .from('videos')
+      .insert([{ video_url: publicUrlData.publicUrl, likes: 0 }]);
+
+    if (insertError) {
+      alert('Veritabanı hatası');
+      console.error(insertError);
+    } else {
+      alert('Yükleme başarılı!');
+      window.location.reload();
+    }
+    setUploading(false);
+  };
+
+  const handleLike = async (video) => {
+    const updatedLikes = (video.likes || 0) + 1;
+    await supabase
+      .from('videos')
+      .update({ likes: updatedLikes })
+      .eq('id', video.id);
+
+    setVideos((prev) =>
+      prev.map((v) => (v.id === video.id ? { ...v, likes: updatedLikes } : v))
+    );
+  };
+
   return (
-    <div
-      className="w-screen h-screen overflow-hidden relative"
-      onWheel={handleScroll}
-    >
+    <div className="app" onWheel={handleScroll}>
       {videos.length > 0 ? (
-        <video
-          key={videos[current].id}
-          src={videos[current].video_url}
-          className="w-full h-full"
-          autoPlay
-          controls
-          loop
-        />
+        <div className="video-container">
+          <video
+            key={videos[current].id}
+            src={videos[current].video_url}
+            className="video"
+            autoPlay
+            controls
+            loop
+          />
+          <div className="actions">
+            <button onClick={() => handleLike(videos[current])}>❤️ {videos[current].likes || 0}</button>
+            <button>💬</button>
+            <button>🔗</button>
+          </div>
+        </div>
       ) : (
-        <p className="text-center mt-20">Video bulunamadı</p>
+        <p className="text">Video bulunamadı</p>
       )}
 
-      <div className="controls">
-        <div className="control-button">❤️</div>
-        <div className="control-button">💬</div>
-        <div className="control-button">🔗</div>
+      <div className="upload-box">
+        <input type="file" accept="video/*" onChange={(e) => setFile(e.target.files[0])} />
+        <button onClick={handleUpload} disabled={uploading}>
+          {uploading ? 'Yükleniyor...' : 'Yükle'}
+        </button>
       </div>
     </div>
   );

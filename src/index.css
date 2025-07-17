@@ -1,31 +1,44 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-body {
-  background-color: black;
-  font-family: sans-serif;
+.app {
+  width: 100vw;
+  height: 100vh;
+  background: black;
   color: white;
   overflow: hidden;
+  position: relative;
+  font-family: sans-serif;
 }
-video {
-  max-height: 100vh;
+.video-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.video {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
-.controls {
+.actions {
   position: absolute;
+  bottom: 20%;
   right: 10px;
-  bottom: 100px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
-.control-button {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 10px;
+.actions button {
+  background: white;
+  color: black;
+  border: none;
   border-radius: 50%;
-  text-align: center;
+  width: 48px;
+  height: 48px;
   font-size: 20px;
-  cursor: pointer;
+}
+.upload-box {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+.text {
+  padding: 20px;
 }
