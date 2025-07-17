@@ -1,5 +1,5 @@
 {
-  "name": "aitok-web",
+  "name": "aitok-ui",
   "version": "1.0.0",
   "scripts": {
     "dev": "vite",
